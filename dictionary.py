@@ -25,10 +25,11 @@ def filterIgnoreSpace(function,cipher,sortedShiftList):
 			print(input1)
 			return param
 def recursiveCheck(list1,index,length):
+	ONE_LETTER_WORDS = ['a','i','o']
 	word = list1[index:index+length]
 	longerWord = list1[index:index+length+1]
 	nextWord = list1[index+length:index+length+1]
-	if twl.check(word):
+	if twl.check(word) or word in ONE_LETTER_WORDS:
 		if index+length >= len(list1) - 1:
 			return True
 		elif twl.check(longerWord) or len(twl.children(longerWord)) > 0:
@@ -36,7 +37,8 @@ def recursiveCheck(list1,index,length):
 		else: 
 			return recursiveCheck(list1,index+length,1)
 	elif twl.check(longerWord) or len(twl.children(longerWord)) > 0:
-		if index+length > len(list1) - 1: return False
+		if index+length > len(list1) - 1: 
+			return False
 		return recursiveCheck(list1,index,length+1)
 	else: 
 		return False
