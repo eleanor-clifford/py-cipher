@@ -29,37 +29,6 @@ def sort(function, list1, parameters, cipherLetterFrequency):
 		shiftPossibility.append(tempPossibility)
 	return [-x for _,x in sorted(zip(shiftPossibility, range(26)))][::-1]
 	
-def dictionaryFilter(function,cipher,sortedShiftList): # last is tuple 
-	FAILURE_THRESHOLD = 0.2
-	for param in sortedShiftList:
-		print(param)
-		input1 = shiftLinearNoCheck(function,cipher,param[0],param[1])
-		inputList = input1.split()
-		failRate = FAILURE_THRESHOLD * len(inputList)
-		fails = 0
-		for word in inputList:
-			if not twl.check(word.lower()):
-				fails += 1
-		if fails < failRate: return input1
-
-def dictionaryFilterIgnoreSpace(function,cipher,sortedShiftList):
-	for param in sortedShiftList:
-		print(param)
-		input1 = shiftLinearNoCheck(function,cipher,param[0],param[1])
-		if recursiveDictionaryCheck(input1,0,1): return param
-def recursiveDictionaryCheck(list1,index,length):
-	word = list1[index:index+length]
-	longerWord = list1[index:index+length+1]
-	nextWord = list1[index+length:index+length+1]
-	if twl.check(word):
-		if index+length == len(list1) - 1:
-			return True
-		elif twl.check(longerWord) or len(twl.children(longerWord)) > 0:
-			return recursiveDictionaryCheck(list1,index,length+1) or recursiveDictionaryCheck(list1,index+length,1)
-		else: return recursiveDictionaryCheck(list1,index+length,1)
-	elif twl.check(longerWord) or len(twl.children(longerWord)) > 0:
-		return recursiveDictionaryCheck(list1,index,length+1)
-	else: return False
 
 def sortLinear(function, list1, a, b, cipherLetterFrequency):
 	letterFrequency = [0.0817, 0.0149, 0.0278, 0.0425, 0.127, 0.0223, 0.0202, 0.0609, 0.0697, 0.0015, 0.0077, 0.0402, 0.0241, 0.0675, 0.0751, 0.0193, 0.0009, 0.0599, 0.0633, 0.0906, 0.0276, 0.0098, 0.0236, 0.0015, 0.0197, 0.0007] 
