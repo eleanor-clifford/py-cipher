@@ -1,5 +1,16 @@
 '''
-Depends on shiftLinear from core
+A few common functions for checking possible solutions
+
+Functionality:
+- Recursively check against a scrabble dictionary and list of one letter words and return a Boolean and the decrypted cipher
+
+Sample Usage:
+
+>>> from cipher import dictionary
+>>> dictionary.filterIgnoreSpace(lambda x, a, b: a*x + b, <affine cipher>, <list of possible shifts as (a,b)>)
+<decrypted cipher>
+
+Depends: cipher.core.shiftLinear, twl
 '''
 import twl
 from core import shiftLinear

@@ -1,5 +1,21 @@
 '''
-Common Functions for cipher cracking
+A few common functions for cipher cracking
+
+Functionality:
+
+- Return a list of letter frequency from a given string
+- Sort a string with a given linear function into a list of inputs based on letter frequency
+- Shift a given string based on a linear function and inputs
+
+Sample Usage:
+>>> from cipher import core
+>>> letterFrequency = core.frequencyList(<encrypted string>)
+>>> core.sortLinear(lambda x, a, b: a*x + b,<encrypted string>,range(1,5),range(26))
+[(<a1>,<b1>),(<a2>,<b2>)...(<a104>,<b104>)]
+>>> core.shiftLinear(lambda x, a, b: a*x + b,<encrypted string>,<a1>,<b1>)
+<possibly decrypted string>
+
+
 '''
 import twl
 
@@ -24,7 +40,7 @@ def sortLinear(function, list1, a, b, cipherLetterFrequency):
 				tempPossibility += cipherLetterFrequency[(function(letter,param1,param2))%26] * letterFrequency[letter]
 			shiftPossibility.append(tempPossibility)
 			paramList.append((param1,param2))
-	return [(a,-b) for _,(a,b) in sorted(zip(shiftPossibility, paramList))][::-1]
+	return [(a,b) for _,(a,b) in sorted(zip(shiftPossibility, paramList))][::-1]
 
 def shiftLinear(function, list1, a, b):
 	newInput = ""
