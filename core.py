@@ -41,7 +41,7 @@ def sortLinear(function, list1, a, b, cipherLetterFrequency):
 				tempPossibility += cipherLetterFrequency[(function(letter,param1,param2))%26] * letterFrequency[letter]
 			shiftPossibility.append(tempPossibility)
 			paramList.append((param1,param2))
-	print(len(shiftPossibility))
+	#print(len(shiftPossibility))
 	return [(a,-b) for _,(a,b) in sorted(zip(shiftPossibility, paramList))][::-1]
 
 def caesarShiftNoCheck(function,list1,param):

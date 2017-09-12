@@ -21,24 +21,28 @@ def filter(function,cipher,sortedShiftList): # last is tuple
 def filterIgnoreSpace(function,cipher,sortedShiftList):
 	for param in sortedShiftList:
 		input1 = shiftLinearNoCheck(function,cipher,param[0],param[1])
-		if recursiveCheck(input1,0,1):
-			print(input1)
-			return param
-def recursiveCheck(list1,index,length):
+		solution,output = recursiveCheck(input1,0,1)
+		if solution:
+			return (output,param)
+def recursiveCheck(list1,index,length,partialSolution=''):
 	ONE_LETTER_WORDS = ['a','i','o']
 	word = list1[index:index+length]
 	longerWord = list1[index:index+length+1]
 	nextWord = list1[index+length:index+length+1]
 	if twl.check(word) or word in ONE_LETTER_WORDS:
-		if index+length >= len(list1) - 1:
-			return True
+		if index+length > len(list1) - 1:
+			return True,(partialSolution+word)
 		elif twl.check(longerWord) or len(twl.children(longerWord)) > 0:
-			return recursiveCheck(list1,index,length+1) or recursiveCheck(list1,index+length,1)
+			# TODO: find more elegant way of recursing
+			longer,partL = recursiveCheck(list1,index,length+1,partialSolution)
+			next,partN = recursiveCheck(list1,index+length,1,partialSolution+word+" ")
+			if longer: return longer,partL
+			else: return next,partN
 		else: 
-			return recursiveCheck(list1,index+length,1)
+			return recursiveCheck(list1,index+length,1,partialSolution+word+" ")
 	elif twl.check(longerWord) or len(twl.children(longerWord)) > 0:
 		if index+length > len(list1) - 1: 
-			return False
-		return recursiveCheck(list1,index,length+1)
+			return False,""
+		return recursiveCheck(list1,index,length+1,partialSolution)
 	else: 
-		return False
+		return False,""
