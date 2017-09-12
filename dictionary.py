@@ -1,15 +1,15 @@
 '''
-Depends on shiftLinearNoCheck from core
+Depends on shiftLinear from core
 '''
 import twl
-from core import shiftLinearNoCheck
+from core import shiftLinear
 
 
 def filter(function,cipher,sortedShiftList): # last is tuple 
 	FAILURE_THRESHOLD = 0.2
 	for param in sortedShiftList:
 		print(param)
-		input1 = shiftLinearNoCheck(function,cipher,param[0],param[1])
+		input1 = shiftLinear(function,cipher,param[0],param[1])
 		inputList = input1.split()
 		failRate = FAILURE_THRESHOLD * len(inputList)
 		fails = 0
@@ -20,7 +20,7 @@ def filter(function,cipher,sortedShiftList): # last is tuple
 
 def filterIgnoreSpace(function,cipher,sortedShiftList):
 	for param in sortedShiftList:
-		input1 = shiftLinearNoCheck(function,cipher,param[0],param[1])
+		input1 = shiftLinear(function,cipher,param[0],param[1])
 		solution,output = recursiveCheck(input1,0,1)
 		if solution:
 			return (output,param)
