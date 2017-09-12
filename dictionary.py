@@ -17,6 +17,12 @@ from core import shiftLinear
 
 
 def filter(function,cipher,sortedShiftList): # last is tuple 
+	'''
+	Checks each word of an input, shifted by the function and looping through a list of inputs, `sortedShiftList` 
+	against the scrabble dictionary and returns a decrypted string if it passes
+	Returns None if none of the possibilities pass the test
+	''' 
+
 	FAILURE_THRESHOLD = 0.2
 	for param in sortedShiftList:
 		print(param)
