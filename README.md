@@ -9,7 +9,7 @@ A few common tools for classical cipher cracking, implemented in Python 3. Uses 
 
 ##### Test All:
     $ ./test-all.py
-    ZGGZX PZGWZ DM
+    ZGG ZXP ZGW ZDM
     AFFINE TEST...SUCCESS
     attack at dawn
     D(x): x -> 25(x-11) mod 26
@@ -32,10 +32,10 @@ Sample Usage:
 
     >>> from cipher import core
     >>> letterFrequency = core.frequencyList(<encrypted string>)
-    >>> core.sortLinear(lambda x, a, b: a*x + b,<encrypted string>,range(1,5),range(26))
+    >>> core.sortLinear(lambda x, a, b: a(x - b),<encrypted string>,range(1,5),range(26))
     [(<a1>,<b1>),(<a2>,<b2>)...(<a104>,<b104>)]
-    >>> core.shiftLinear(lambda x, a, b: a*x + b,<encrypted string>,<a1>,<b1>)
-    <decrypted string>
+    >>> core.shiftLinear(lambda x, a, b: a(x - b),<encrypted string>,<a1>,<b1>)
+    <possibly decrypted string>
 
 ### Dictionary module:
 
@@ -46,7 +46,7 @@ Functionality:
 Sample Usage:
 
     >>> from cipher import dictionary
-    >>> dictionary.filterIgnoreSpace(lambda x, a, b: a*x + b, <affine cipher>, <list of possible shifts as (a,b)>)
+    >>> dictionary.filterIgnoreSpace(lambda x, a, b: a*(x - b), <affine cipher>, <list of possible shifts as (a,b)>)
     <decrypted cipher>
 
 ### Supported ciphers

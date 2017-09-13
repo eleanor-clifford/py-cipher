@@ -14,8 +14,6 @@ Sample Usage:
 [(<a1>,<b1>),(<a2>,<b2>)...(<a104>,<b104>)]
 >>> core.shiftLinear(lambda x, a, b: a*x + b,<encrypted string>,<a1>,<b1>)
 <decrypted string>
-
-
 '''
 import twl
 

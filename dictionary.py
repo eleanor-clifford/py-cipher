@@ -7,7 +7,7 @@ Functionality:
 Sample Usage:
 
 >>> from cipher import dictionary
->>> dictionary.filterIgnoreSpace(lambda x, a, b: a*x + b, <affine cipher>, <list of possible shifts as (a,b)>)
+>>> dictionary.filterIgnoreSpace(lambda x, a, b: a*(x - b), <affine cipher>, <list of possible shifts as (a,b)>)
 <decrypted cipher>
 
 Depends: cipher.core.shiftLinear, twl
@@ -21,11 +21,13 @@ def filter(function,cipher,sortedShiftList): # last is tuple
 	Checks each word of an input, shifted by the function and looping through a list of inputs, `sortedShiftList` 
 	against the scrabble dictionary and returns a decrypted string if it passes
 	Returns None if none of the possibilities pass the test
+
+	>>> filter(lambda x, a, b: a*(x - b), "NGGNPX NG QNJA", [(5,1),(3,4),(1,13)])
+	'attack at dawn'
 	''' 
 
 	FAILURE_THRESHOLD = 0.2
 	for param in sortedShiftList:
-		print(param)
 		input1 = shiftLinear(function,cipher,param[0],param[1])
 		inputList = input1.split()
 		failRate = FAILURE_THRESHOLD * len(inputList)
@@ -36,12 +38,28 @@ def filter(function,cipher,sortedShiftList): # last is tuple
 		if fails < failRate: return input1
 
 def filterIgnoreSpace(function,cipher,sortedShiftList):
+	'''
+	Runs recursiveCheck against a list of possible inputs with a function and returns a properly spaced string
+	and the correct inputs
+
+	>>> filterIgnoreSpace(lambda x, a, b: a*(x - b), "NGG NPX NGQ NJA", [(5,1),(2,4),(1,13)])
+	'attack at dawn' 
+	'''
 	for param in sortedShiftList:
-		input1 = shiftLinear(function,cipher,param[0],param[1])
+		input1 = shiftLinear(function,cipher,param[0],param[1]).replace(" ","")
 		solution,output = recursiveCheck(input1,0,1)
 		if solution:
 			return (output,param)
-def recursiveCheck(list1,index,length,partialSolution=''):
+def recursiveCheck(list1,index=0,length=1,partialSolution=''):
+	'''
+	Checks an input recursively against a scrabble dictionary (or 'a','i','o').
+	The input must have no spaces - so string.replace(" ","") should be used on the input.
+	In most cases it is better to use filterIgnoreSpace than recursiveCheck
+
+	>>> solution = "att ack atd awn" 
+	>>> recursiveCheck(solution.replace(" ",""))
+	(True, 'attack at dawn')
+	'''
 	ONE_LETTER_WORDS = ['a','i','o']
 	word = list1[index:index+length]
 	longerWord = list1[index:index+length+1]
