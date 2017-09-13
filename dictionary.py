@@ -12,7 +12,7 @@ Sample Usage:
 
 Depends: cipher.core.shiftLinear, twl
 '''
-import twl
+from TWL06 import twl
 from core import shiftLinear
 
 

@@ -15,7 +15,6 @@ Sample Usage:
 >>> core.shiftLinear(lambda x, a, b: a*x + b,<encrypted string>,<a1>,<b1>)
 <decrypted string>
 '''
-import twl
 
 def frequencyList(input1):
 	'''
