@@ -9,10 +9,10 @@ A few common tools for classical cipher cracking, implemented in Python 3. Uses 
 
 ##### Test All:
     $ ./test-all.py
-    <input>
+    ZGGZX PZGWZ DM
     AFFINE TEST...SUCCESS
-    <decrypted cipher>
-    D(x): x -> <a>(x - <b>) mod 26
+    attack at dawn
+    D(x): x -> 25(x-11) mod 26
     
 or:
     
