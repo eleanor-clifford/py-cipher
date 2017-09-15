@@ -8,6 +8,26 @@ ZGGZX PZGWZ DM
 AFFINE TEST...SUCCESS
 attack at dawn
 D(x): x -> 25(x-11) mod 26
+
+$ ./test-all.py
+TSCRC RPFBY WKQAI CMSBQ
+AFFINE TEST...FAILED
+KEYWORD TEST...SUCCESS
+this is a keyword cipher
+Keyword is pliablenesses
+
+As the decryption is tested against a number of obscure words there can sometimes be (especially for short ciphers)
+a decryption which is technically correct english, but makes no sense. For this reason, in keyword test, 
+the user will sometimes be prompted to ask whether a string is english. After answering the question is cleared from 
+stdout (using VT100 control codes) and the program carries on. It is recommended to run the program directly from a 
+terminal as the control codes do not format properly otherwise, i.e use
+
+$ chmod +x test-all.py
+$ ./test-all.py
+or
+$ python3 test-all.py
+
+also, this will only format correctly in *nix based systems
 '''
 import core, dictionary, key
 from TWL06 import twl
@@ -23,20 +43,22 @@ if affine:
 	print("D(x): x -> ",affine[1][0],"(x","-",affine[1][1],") mod 26",sep="")
 else: 
 	print("FAILED")
-	print("KEYWORD TEST...",end="")
+	print("KEYWORD TEST...",end="",flush=True)
 	words = set(twl.iterator())
 	for word in words:
 		cipherAlphabet = key.fixDouble(word + "abcdefghijklmnopqrstuvwxyz")
 		decrypted = key.shift(cipher,cipherAlphabet)
 		keyword = dictionary.recursiveCheck(decrypted.replace(" ",""))
 		if keyword[0]:
-			print("SUCCESS")
-			print("is",keyword[1],"english? ",end="")
+			# see https://stackoverflow.com/questions/12586601/remove-last-stdout-line-in-python
+			CURSOR_UP_ONE = '\x1b[1A'
+			ERASE_LINE = '\x1b[2K'
+			print("is \"",keyword[1],"\" english? ",end="", sep="") 
 			if input()[0] == 'y':
-				print("Keyword is",word)
+				print(CURSOR_UP_ONE+ERASE_LINE+"\rKEYWORD TEST...SUCCESS\n"+keyword[1]+"\nKeyword is "+word)
 				break
 			else:
-				print("KEYWORD TEST...",end="")
+				print(CURSOR_UP_ONE+ERASE_LINE+"\rKEYWORD TEST...",end="",flush=True)
 	else:
 		print("FAILED")
 		print("RANDOM KEY TEST...")
@@ -44,7 +66,7 @@ else:
 		for length in range(1,MAX_LENGTH):
 			if length > 1: 
 				print("FAILED")
-			print("\t",length,"LETTER WORDS...",end="")
+			print("\t",length,"LETTER WORDS...",end="",flush=True)
 			for x in range(26**length):
 				output = ""
 				while x > 0:
@@ -60,7 +82,6 @@ else:
 						print("Keyword is",word)
 						break
 					else:
-						print("RANDOM KEY TEST...",end="")
-		
+						print("RANDOM KEY TEST...",end="",flush=True)
 
 
