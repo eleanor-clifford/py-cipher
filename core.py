@@ -29,7 +29,7 @@ def frequencyList(input1):
 		for i in input1:
 			if ord(i.lower()) == letter:
 				tempFrequency += 1
-		cipherLetterFrequency.append(tempFrequency) # / len(input1))
+		cipherLetterFrequency.append((tempFrequency) / len(input1))
 	return cipherLetterFrequency
 
 def sortLinear(function, list1, a, b, cipherLetterFrequency):

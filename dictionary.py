@@ -15,7 +15,6 @@ Depends: cipher.core.shiftLinear, twl
 from TWL06 import twl
 from core import shiftLinear
 
-
 def filter(function,cipher,sortedShiftList): # last is tuple 
 	'''
 	Checks each word of an input, shifted by the function and looping through a list of inputs, `sortedShiftList` 
@@ -81,3 +80,8 @@ def recursiveCheck(list1,index=0,length=1,partialSolution=''):
 		return recursiveCheck(list1,index,length+1,partialSolution)
 	else: 
 		return False,""
+
+def keyFind(cipher):
+	words = set(twl.iterator())
+	for word in words:
+		print(word)
