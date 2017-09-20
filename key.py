@@ -30,3 +30,6 @@ def fixDouble(alphabet):
 			if alphabet[last] == alphabet[i]: canAdd = False
 		if canAdd: adjusted += alphabet[i]
 	return adjusted
+
+def alphabetBuilder(cipher, possiblePhrase):
+	raise NotImplementedError

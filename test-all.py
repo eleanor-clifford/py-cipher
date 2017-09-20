@@ -83,5 +83,3 @@ else:
 						break
 					else:
 						print("RANDOM KEY TEST...",end="",flush=True)
-
-
