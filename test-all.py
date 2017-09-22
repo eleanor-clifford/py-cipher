@@ -68,7 +68,7 @@ else:
 	else:
 		print("FAILED")
 		print("RANDOM KEY TEST...")
-		MAX_LENGTH = 10
+		MAX_LENGTH = 4
 		for length in range(1,MAX_LENGTH):
 			if length > 1: 
 				print("FAILED")
@@ -89,5 +89,3 @@ else:
 						break
 					else:
 						print("RANDOM KEY TEST...",end="",flush=True)
-
-
