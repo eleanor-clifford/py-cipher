@@ -80,8 +80,3 @@ def recursiveCheck(list1,index=0,length=1,partialSolution=''):
 		return recursiveCheck(list1,index,length+1,partialSolution)
 	else: 
 		return False,""
-
-def keyFind(cipher):
-	words = set(twl.iterator())
-	for word in words:
-		print(word)

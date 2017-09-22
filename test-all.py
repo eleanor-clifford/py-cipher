@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# *-* coding: iso-8859-1 *-*
 ''' 
 Uses the core and dictionary modules to test for Affine ciphers (includes Caesar and Atbash)
 
@@ -29,10 +30,15 @@ $ python3 test-all.py
 
 also, this will only format correctly in *nix based systems
 '''
-import core, dictionary, key
+import core, dictionary, key, file
 from TWL06 import twl
+path = input("Enter path of file to read from (cipher.txt): ")
+try:
+	cipher = file.openAsAscii(path)
+except FileNotFoundError: 
+	cipher = input("File not found. Enter cipher:\n")
+
 COPRIMES = [1,3,5,7,9,11,15,17,19,21,23,25] # coprimes of 26 - the modular multiplicative inverse is the same set
-cipher = input()
 f = core.frequencyList(cipher)
 print("AFFINE TEST...",end="")
 affineShiftList = core.sortLinear(lambda x, a, b: a*(x - b), cipher, COPRIMES, range(26), f)
