@@ -36,7 +36,7 @@ path = input("Enter path of file to read from (cipher.txt): ")
 try:
 	cipher = file.openAsAscii(path)
 except FileNotFoundError: 
-	cipher = input("File not found. Enter cipher:\n")
+	cipher = bytes(input("File not found. Enter cipher:\n"),"ascii")
 
 COPRIMES = [1,3,5,7,9,11,15,17,19,21,23,25] # coprimes of 26 - the modular multiplicative inverse is the same set
 f = core.frequencyList(cipher)
@@ -52,9 +52,9 @@ else:
 	print("KEYWORD TEST...",end="",flush=True)
 	words = set(twl.iterator())
 	for word in words:
-		cipherAlphabet = key.fixDouble(word + "abcdefghijklmnopqrstuvwxyz")
+		cipherAlphabet = key.fixDouble(bytearray(word + "abcdefghijklmnopqrstuvwxyz","ascii"))
 		decrypted = key.shift(cipher,cipherAlphabet)
-		keyword = dictionary.recursiveCheck(decrypted.replace(" ",""))
+		keyword = dictionary.recursiveCheck(str(decrypted,"utf-8").replace(" ",""))
 		if keyword[0]:
 			# see https://stackoverflow.com/questions/12586601/remove-last-stdout-line-in-python
 			CURSOR_UP_ONE = '\x1b[1A'

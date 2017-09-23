@@ -9,25 +9,30 @@ Functionality:
 
 Sample Usage:
 >>> from cipher import core
->>> letterFrequency = core.frequencyList(<encrypted string>)
->>> core.sortLinear(lambda x, a, b: a*x + b,<encrypted string>,range(1,5),range(26))
+>>> letterFrequency = core.frequencyList(<encrypted bytearray>)
+>>> core.sortLinear(lambda x, a, b: a*x + b,<encrypted bytearray>,range(1,5),range(26))
 [(<a1>,<b1>),(<a2>,<b2>)...(<a104>,<b104>)]
->>> core.shiftLinear(lambda x, a, b: a*x + b,<encrypted string>,<a1>,<b1>)
+>>> core.shiftLinear(lambda x, a, b: a*x + b,<encrypted bytearray>,<a1>,<b1>)
 <decrypted string>
 '''
 
-def frequencyList(input1):
+def frequencyList(input1,utf8=False):
 	'''
-	Returns a list of the frequency of characters in a string
+	Returns a list of the frequency of characters in a string as fractions of the total
 
-	>>> freqencyList("abcde")
-	[1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	>>> frequencyList("abcde",utf8=True)
+	[0.2, 0.2, 0.2, 0.2, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+	>>> frequencyList(bytearray("abcde","ascii"))
+	[0.2, 0.2, 0.2, 0.2, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 	'''
 	cipherLetterFrequency = []
 	for letter in range(97,123):
 		tempFrequency = 0
-		for i in input1:
-			if ord(i.lower()) == letter:
+		for i in input1.lower():
+			if utf8:
+				if ord(i) == letter: tempFrequency += 1
+			elif i == letter:
 				tempFrequency += 1
 		cipherLetterFrequency.append((tempFrequency) / len(input1))
 	return cipherLetterFrequency
@@ -52,17 +57,28 @@ def sortLinear(function, list1, a, b, cipherLetterFrequency):
 			paramList.append((param1,param2))
 	return [(a,b) for _,(a,b) in sorted(zip(shiftPossibility, paramList))][::-1]
 
-def shiftLinear(function, list1, a, b):
+def shiftLinear(function, list1, a, b, utf8=False):
 	'''
 	Shifts a given string by the function and two input values `a` and `b`
-	>>> core.shiftLinear(lambda x, a, b: a*x + b,<encrypted string>, a, b)
-	<decrypted string>
+	>>> core.shiftLinear(lambda x, a, b: a*(x - b),"NGGNPX NG QNJA",1,13,utf8=True)
+	'attack at dawn'
+	>>> core.shiftLinear(lambda x, a, b: a*(x - b),bytearray("NGGNPX NG QNJA","ascii"),1,13)
+	bytearray(b'attack at dawn')
 	'''
-	newInput = ""
-	for i in list1.lower():
-		if ord(i) < 97 or ord(i) > 122:
-			newInput += i
-		else:		
-			newInput += chr((function(ord(i),a,b) - 97) % 26 + 97)
-	return newInput
+	if utf8:
+		newInput=""
+		for i in list1.lower():
+			if ord(i) < 97 or ord(i) > 122:
+				newInput += i
+			else:		
+				newInput += chr((function(ord(i),a,b) - 97) % 26 + 97)
+		return newInput
+	else:
+		newInput = bytearray("","ascii")
+		for i in list1.lower():
+			if i < 97 or i > 122:
+				newInput += bytes([i])
+			else:		
+				newInput += bytes([(function(i,a,b) - 97) % 26 + 97])
+		return newInput
 

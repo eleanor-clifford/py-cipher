@@ -22,10 +22,15 @@ def pattern(word):
 def toTupleArray(cipher):
 	wordList = cipher.split(" ")
 	array = np.empty(len(wordList),dtype=tuple)
-	wordTuple = namedtuple('wordTuple','word length solved pattern')
+	wordTuple = namedtuple('wordTuple','word original length solved pattern')
 	for i,j in enumerate(wordList):
-		array[i] = wordTuple(word=j,length=len(j),solved=[False]*len(j),pattern=pattern(j))
+		array[i] = wordTuple(word=bytearray(j),original=j,length=len(j),solved=np.array([False]*len(j)),pattern=pattern(j))
 	return array
+
+def scrap(tupleArray):
+	for word in tupleArray:
+		word.word = word.original
+		for i in word.solved: i = False
 
 def wordPossibilities(plaintext,tupleArray):
 	possibilities = []
@@ -56,3 +61,6 @@ class cipherAlphabet:
 	
 	def __init__(self): raise NotImplementedError
 
+#def partialCheck(tupleArray):
+#	for word in tupleArray:
+#		if word
