@@ -20,7 +20,7 @@ def pattern(word):
 	return pattern
 
 def toTupleArray(cipher):
-	wordList = cipher.split(" ")
+	wordList = cipher.split(bytes([ord(" ")]))
 	array = np.empty(len(wordList),dtype=tuple)
 	wordTuple = namedtuple('wordTuple','word original length solved pattern')
 	for i,j in enumerate(wordList):
@@ -45,22 +45,32 @@ def wordPossibilities(plaintext,tupleArray):
 	return sortedP
 
 class cipherAlphabet:
-#	current = np.zeros(26,dtype="object")
-#	def __init__(self): 
-#		for i,letter in enumerate("abcdefghijklmnopqrstuvwxyz"):
-#			self.current[i] = [letter,False]
-#			
-#	nowhere = []
-#	duplicate = []
-#	def set(self,plain,cipher):
-#		index = np.where(self.current==[cipher,False])
-#		print(index)
-#		print(self.current[index])
-#		self.current[index][0] = plain
-#		self.current[index][1] = True
+	current = np.zeros(26,dtype="object")
+	def __init__(self): 
+		for i,letter in enumerate("abcdefghijklmnopqrstuvwxyz"):
+			self.current[i] = [letter,False]		
+	nowhere = []
+	duplicate = []
+	def set(self,plain,cipher):
+		index = np.where(self.current==[cipher,False])
+		print(index)
+		print(self.current[index])
+		self.current[index][0] = plain
+		self.current[index][1] = True
 	
-	def __init__(self): raise NotImplementedError
+# def __init__(self): raise NotImplementedError
+def shift(ciphertext,plaintext,tupleArray):
+	for cipher,plain in zip(ciphertext,plaintext):
+		for word in tupleArray:
+			for i,letter in word.word:
+				if letter == cipher and solved[i] == False:
+					word.word[i] == plain
+					word.solved[i] == true 
 
-#def partialCheck(tupleArray):
-#	for word in tupleArray:
-#		if word
+
+
+def partialCheck(tupleArray):
+	for word in tupleArray:
+		if word.length == 1 and word not in [bytes([ord("a")]),bytes([ord("i")]),bytes([ord("o")])]: return False
+		elif not (False in word.solved and twl.check(word.word,"utf-8")): return False
+	return True
