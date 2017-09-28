@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import numpy as np
 p = input("Possible words in order of certainty: ").split()
 inputArray = p
 import file, substitution
