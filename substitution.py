@@ -64,13 +64,17 @@ class cipherAlphabet:
 	nowhere = []
 	duplicate = []
 	def set(self,plaintext,ciphertext):
+		done = bytearray("","ascii")
 		for plain,cipher in zip(plaintext,ciphertext):
-			for i,letterList in enumerate(self.current):
-				if cipher == letterList[0] and letterList[1] == False: 
-					self.current[i][0] = plain
-					self.current[i][1] = True
-					break
-			else: print("WARNING:",cipher,"is not a letter or has already been set")
+			index = (cipher-97)%26
+			if not self.current[index][1]:
+				self.current[i][0] = plain
+				self.current[i][1] = True
+				done += bytes([cipher])					
+				break
+			else: 
+				if cipher in done: continue
+				else: print("WARNING:",cipher,"is not a letter or has already been set")
 	def scrap(self):
 		for i,letter in enumerate(self.current):
 			if letter[1]: 

@@ -10,6 +10,7 @@ a = substitution.cipherAlphabet()
 accepted = []
 for word in inputArray:
 	for ciphertext in substitution.wordPossibilities(word,tupleArray):
+		for i,j in accepted: a.set(i,j)
 		a.set(word,ciphertext)
 		substitution.shift(a,tupleArray)
 		if substitution.partialCheck(tupleArray): 
@@ -19,8 +20,9 @@ for word in inputArray:
 		else:
 			tupleArray.scrap()
 			a.scrap()
-			for i,j in accepted: a.set(i,j)
+			
 	else: 
 		print("NO SOLUTIONS")
 		raise SystemExit
+print(accepted)
 print(tupleArray.show())
