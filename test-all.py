@@ -51,7 +51,7 @@ else:
 	print("FAILED")
 	print("KEYWORD TEST...",end="",flush=True)
 	words = set(twl.iterator())
-	for word in words:
+	for word in ["testa","testb","testc"]: #words:
 		cipherAlphabet = key.fixDouble(bytearray(word + "abcdefghijklmnopqrstuvwxyz","ascii"))
 		decrypted = key.shift(cipher,cipherAlphabet)
 		keyword = dictionary.recursiveCheck(str(decrypted,"utf-8").replace(" ",""))
@@ -78,9 +78,9 @@ else:
 				while x > 0:
 					output += chr(97+x%26)
 					x = x//26
-				cipherAlphabet = key.fixDouble(output[::-1] + "abcdefghijklmnopqrstuvwxyz")
+				cipherAlphabet = key.fixDouble(bytearray(output[::-1] + "abcdefghijklmnopqrstuvwxyz","ascii"))
 				decrypted = key.shift(cipher,cipherAlphabet)
-				keyword = dictionary.recursiveCheck(decrypted.replace(" ",""))
+				keyword = dictionary.recursiveCheck(str(decrypted,"utf-8").replace(" ",""))
 				if keyword[0]:
 					print("SUCCESS")
 					print("is",keyword[1],"english? ",end="")
