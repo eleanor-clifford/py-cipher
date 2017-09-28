@@ -38,6 +38,7 @@ class tupleArray:
 				if word.solved[j]: print(chr(letter).lower(),end="")
 				else: print(chr(letter).upper(),end="")
 			print(" ",end="")
+		print("\n",end="")
 	def scrap(self):
 		for word in self.array:
 			for i in range(len(word.word)): word.word[i] = word.original[i]
@@ -47,7 +48,7 @@ def wordPossibilities(plaintext,tupleArray):
 	possibilities = []
 	for word in tupleArray.array:
 		if np.array_equal(word.pattern,pattern(plaintext)): 
-			possibilities.append(str(word.word,"utf-8"))
+			possibilities.append(str(word.original,"utf-8"))
 	count = Counter(possibilities)
 	possibilities = sorted(possibilities, key=lambda x: -count[x])
 	sortedP = []
@@ -63,16 +64,24 @@ class cipherAlphabet:
 			self.current[i] = [letter,False]		
 	nowhere = []
 	duplicate = []
+	found = []
 	def set(self,plaintext,ciphertext):
 		done = bytearray("","ascii")
+		### CHECK:
 		for plain,cipher in zip(plaintext,ciphertext):
-			print(plain,cipher)
+			for p,c in self.found:
+				for i,j in zip(p,c):
+					if (i == plain) ^ (j == cipher):
+						#print(chr(i),chr(j),"XOR",chr(plain),chr(cipher))
+						return 1
+		### CHANGE:
+		for plain,cipher in zip(plaintext,ciphertext):
+
 			index = (cipher-97)%26
 			if not self.current[index][1]:
 				self.current[index][0] = plain
 				self.current[index][1] = True
 				done += bytes([cipher])					
-				continue
 			else: 
 				if cipher in done: continue
 				else: print("WARNING:",cipher,"is not a letter or has already been set")
@@ -84,7 +93,7 @@ class cipherAlphabet:
 # def __init__(self): raise NotImplementedError
 def shift(alphabet,tupleArray):
 	for cipher,plain in enumerate(alphabet.current):
-		print(plain,cipher)
+		#print(plain,cipher)
 		if plain[1]:
 			cipher += 65
 			plain = plain[0]
@@ -103,19 +112,34 @@ def partialCheck(tupleArray):
 			return False
 	return True
 
-#def recursiveSolve(words, tupleArray, accepted=[]): # returns tupleArray
-#	if len(words) == 0: return
-#	word = bytearray(words[0],"ascii")
-#	alphabet = cipherAlphabet()
-#	for solution in wordPossibilities(word,tupleArray):
-#		tupleArray.scrap()
-#		alphabet.scrap()
-#		for plain,cipher in accepted:
-#			alphabet.set(plain,cipher)
-#		alphabet.set(word,solution)
-#		shift(alphabet,tupleArray)
-#		if partialCheck(tupleArray):
-#			recursiveSolve(words[1:],tupleArray,accepted + (word,solution))
+def recursiveSolve(words, tupleArray, accepted=[], recursionCounter = 0): # returns tupleArray
+	'''
+	It will recursively try all inputs given to it against all 
+	possibilities in the text, depending on repeated letter patterns, 
+	and return a list of completed words, as (plaintext, ciphertext) tuples
 
-		
 
+	>>> from substitution import recursiveSolve, tupleArray
+	>>> t = tupleArray(bytearray("JL NJIWI","ascii"))
+	>>> recursiveSolve(['hi','there'],t)
+	[(bytearray(b'hi'), bytearray(b'jl')), (bytearray(b'there'), bytearray(b'njiwi'))]
+	>>> t.show()
+	hi there
+	'''
+	if len(words) == 0: return accepted
+	word = bytearray(words[0],"ascii")
+	alphabet = cipherAlphabet()
+	if recursionCounter == 0: alphabet.found += (accepted)
+	for i,solution in enumerate(wordPossibilities(word,tupleArray)):
+		tupleArray.scrap()
+		alphabet.scrap()
+		for plain,cipher in accepted: alphabet.set(plain,cipher)
+		if alphabet.set(word,solution) == 1: 
+			continue
+		else: 
+			shift(alphabet,tupleArray)
+			if partialCheck(tupleArray):
+				alphabet.found.append((word,solution))
+				maybeReturn = recursiveSolve(words[1:],tupleArray,accepted + [(word,solution)],recursionCounter+1)
+				if maybeReturn: 
+					return maybeReturn
