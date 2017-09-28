@@ -66,12 +66,13 @@ class cipherAlphabet:
 	def set(self,plaintext,ciphertext):
 		done = bytearray("","ascii")
 		for plain,cipher in zip(plaintext,ciphertext):
+			print(plain,cipher)
 			index = (cipher-97)%26
 			if not self.current[index][1]:
-				self.current[i][0] = plain
-				self.current[i][1] = True
+				self.current[index][0] = plain
+				self.current[index][1] = True
 				done += bytes([cipher])					
-				break
+				continue
 			else: 
 				if cipher in done: continue
 				else: print("WARNING:",cipher,"is not a letter or has already been set")
@@ -83,7 +84,7 @@ class cipherAlphabet:
 # def __init__(self): raise NotImplementedError
 def shift(alphabet,tupleArray):
 	for cipher,plain in enumerate(alphabet.current):
-		#print(plain,cipher)
+		print(plain,cipher)
 		if plain[1]:
 			cipher += 65
 			plain = plain[0]
