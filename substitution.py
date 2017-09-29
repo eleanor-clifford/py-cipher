@@ -75,13 +75,15 @@ class cipherAlphabet:
 		for i,letter in enumerate(bytearray("abcdefghijklmnopqrstuvwxyz","ascii")):
 			self.current[i] = [letter,False]		
 	found = []
-
 	def show(self):
-		for i in range(26): print(chr(65+i),end=" ")
+		for i in range(26): print(chr(97+i),end=" ")
+		output = np.zeros(26,dtype=int)
+		for i,letter in enumerate(self.current):
+			if letter[1]: output[letter[0] - 97] = i + 65
 		print()
-		for i in self.current:
-			if i[1]:
-				print(chr(i[0]),end=" ")
+		for i in output:
+			if i != 0:
+				print(chr(i),end=" ")
 			else: print(" ",end=" ")
 		print()
 	def set(self,plaintext,ciphertext):
@@ -91,29 +93,37 @@ class cipherAlphabet:
 			for p,c in self.found:
 				for i,j in zip(p,c):
 					if (i == plain) ^ (j == cipher):
-						print(plaintext,ciphertext)
-						print(chr(i),chr(j),"XOR",chr(plain),chr(cipher))
 						return 1
-		### CHANGE:
+		### SET:
 		for plain,cipher in zip(plaintext,ciphertext):
-
+			if not (plaintext,ciphertext) in self.found:
+				self.found.append((plaintext,ciphertext))
 			index = (cipher-97)%26
 			if not self.current[index][1]:
 				self.current[index][0] = plain
 				self.current[index][1] = True
-				done += bytes([cipher])					
-			else: 
-				if cipher in done: continue
-				else: print("WARNING:",cipher,"is not a letter or has already been set")
+				done += bytes([cipher])
+		return 0					
 	def scrap(self):
 		for i,letter in enumerate(self.current):
 			if letter[1]: 
 				self.current[i] = [i+97,False]
+	def fill(self):
+		missingCipher = []
+		for i,letter in enumerate(self.current):
+			if not letter[1]: missingCipher.append(i+97)
+		print(missingCipher)
+		for plain in range(97,123):
+			for i,cipher in enumerate(self.current):
+				if cipher[0] == plain and cipher[1]: break
+			else:
+				print(missingCipher[0]) 
+				self.set(bytes([plain]),bytes([missingCipher[0]]))
+				missingCipher = missingCipher[1:]
+		
 
-# def __init__(self): raise NotImplementedError
 def shift(alphabet,tupleArray):
 	for cipher,plain in enumerate(alphabet.current):
-		#print(plain,cipher)
 		if plain[1]:
 			cipher += 65
 			plain = plain[0]
@@ -127,7 +137,7 @@ def shift(alphabet,tupleArray):
 
 
 
-def recursiveSolve(words, tupleArray, accepted=[], recursionCounter = 0): # returns tupleArray
+def recursiveSolve(words, tupleArray, accepted=[], recursionCounter = 0):
 	'''
 	It will recursively try all inputs given to it against all 
 	possibilities in the text, depending on repeated letter patterns, 
@@ -154,7 +164,6 @@ def recursiveSolve(words, tupleArray, accepted=[], recursionCounter = 0): # retu
 		else: 
 			shift(alphabet,tupleArray)
 			if tupleArray.simpleCheck()[0]:
-				alphabet.found.append((word,solution))
 				maybeReturn = recursiveSolve(words[1:],tupleArray,accepted + [(word,solution)],recursionCounter+1)
 				if maybeReturn: 
 					return maybeReturn
@@ -165,29 +174,28 @@ def flatten(L):
 			yield item
 		else: yield from flatten(item)
 def recursiveGuess(masterArray,alphabet,minWord=6,failCount=0,newWords=[]):
-	print(newWords)
 	tupleArray = copy.deepcopy(masterArray)
 	if tupleArray.fullCheck(): return tupleArray
 	unknowns = []
 	for word in tupleArray.array:
 		if word.length < minWord: continue
-		print(word.word)
-		#print(word,alphabet)
 		possibles = recursiveCheck(word,alphabet)
 		if possibles == None: continue
 		for test in flatten([possibles]):
 			if test == word.word: 
 				break
 			elif alphabet.set(test,word.original.lower()) == 1: 
-				print("WTF",test,word.original)
 				continue
 			else:
 				shift(alphabet,tupleArray)
-				print("shifted",test,word.word)
 				check = tupleArray.simpleCheck()
 				if not check[0] and not check[1].word in newWords:
-					if input("is "+str(check[1].word)+" a word? ")[0] == 'y': 
-						newWords += check[1].word
+					bool = input("is "+str(check[1].word)+" a word? ")[0] == 'y'
+					CURSOR_UP_ONE = '\x1b[1A'
+					ERASE_LINE = '\x1b[2K'
+					print(CURSOR_UP_ONE+ERASE_LINE+"\r",end="")
+					if bool:
+						newWords.append(check[1].word)
 						check[0] = True
 					else:
 						tupleArray = copy.deepcopy(masterArray)
@@ -195,16 +203,14 @@ def recursiveGuess(masterArray,alphabet,minWord=6,failCount=0,newWords=[]):
 				if check[0]:
 					a = recursiveGuess(tupleArray,alphabet,minWord,failCount,newWords)
 					if a: 
+
 						return a
 					else: 
 						failCount += 1
-						print("FAIL",word)
 						break
-						#return tupleArray
 
-		else: 
-			print("FUCK")
-			return masterArray
+	else: 
+		return masterArray
 	
 
 
