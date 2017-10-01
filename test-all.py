@@ -41,6 +41,8 @@ try:
 	cipher = file.openAsAscii(path)
 except FileNotFoundError: 
 	cipher = bytes(input("File not found. Enter cipher:\n"),"ascii")
+out = open("output.txt","w")
+log = open("errorlog.txt","w")
 
 COPRIMES = [1,3,5,7,9,11,15,17,19,21,23,25] # coprimes of 26 - the modular multiplicative inverse is the same set
 f = core.frequencyList(cipher)
@@ -49,73 +51,79 @@ affineShiftList = core.sortLinear(lambda x, a, b: a*(x - b), cipher, COPRIMES, r
 affine = dictionary.filterIgnoreSpace(lambda x, a, b: a*(x - b),cipher,affineShiftList)
 if affine: 
 	print("SUCCESS")
-	print(affine[0])
+	print(affine[0],file=out)
 	print("D(x): x -> ",affine[1][0],"(x","-",affine[1][1],") mod 26",sep="")
+	print("The plaintext has been output to output.txt")
 else:
-	print("FAILED")
-	print("MONOALPHABETIC SUBSTITUTION TEST...")
-	if __debug: cribs = []
-	else: cribs = input("Please enter any cribs you know: ").split()
-	inputArray = cribs + ['the','and']
-	tupleArray = s.tupleArray(cipher)
-	sol = s.recursiveSolve(inputArray,tupleArray)
-	alphabet = s.cipherAlphabet()
-	print(sol)
-	for i,j in sol:
-		alphabet.set(i,j)
-	s.shift(alphabet,tupleArray)
-	tupleArray = s.recursiveGuess(tupleArray,alphabet,minWord=6)
-	tupleArray.show()
-	alphabet.show()
-	a = input("Enter any more letters you can see (enter to fill alphabetically)").split()
-	if len(a) == 2:
-		alphabet.set(bytearray(a[0],"ascii"),bytearray(a[1],"ascii"))
-		if input("Fill also? ")[0] == 'y':
+	try:
+		print("FAILED")
+		print("MONOALPHABETIC SUBSTITUTION TEST...")
+		if __debug: cribs = []
+		else: cribs = input("Please enter any cribs you know: ").split()
+		inputArray = cribs + ['the','and']
+		tupleArray = s.tupleArray(cipher)
+		sol = s.recursiveSolve(inputArray,tupleArray)
+		alphabet = s.cipherAlphabet()
+		for i,j in sol:
+			alphabet.set(i,j)
+		s.shift(alphabet,tupleArray)
+		tupleArray = s.recursiveGuess(tupleArray,alphabet,minWord=6)
+		tupleArray.show()
+		alphabet.show()
+		a = input("Enter any more letters you can see (or enter to fill alphabetically, x to proceed to the next text)").split()
+		print(a,file=log)
+		if len(a) > 0 and a[0].lower()[0] == 'x': pass#raise Exception
+		if len(a) == 2:
+			alphabet.set(bytearray(a[0],"ascii"),bytearray(a[1],"ascii"))
+			if input("Fill also? ")[0] == 'y':
+				alphabet.fill()
+		else:
 			alphabet.fill()
-	else:
-		alphabet.fill()
-	s.shift(alphabet,tupleArray)
-	tupleArray.show()
-	alphabet.show()
-#else: 	
-#	print("FAILED")
-#	print("KEYWORD TEST...",end="",flush=True)
-#	words = set(twl.iterator())
-#	for word in words:
-#		cipherAlphabet = key.fixDouble(bytearray(word + "abcdefghijklmnopqrstuvwxyz","ascii"))
-#		decrypted = key.shift(cipher,cipherAlphabet)
-#		keyword = dictionary.recursiveCheck(str(decrypted,"utf-8").replace(" ",""))
-#		if keyword[0]:
-#			# see https://stackoverflow.com/questions/12586601/remove-last-stdout-line-in-python
-#			CURSOR_UP_ONE = '\x1b[1A'
-#			ERASE_LINE = '\x1b[2K'
-#			print("is \"",keyword[1],"\" english? ",end="", sep="") 
-#			if input()[0] == 'y':
-#				print(CURSOR_UP_ONE+ERASE_LINE+"\rKEYWORD TEST...SUCCESS\n"+keyword[1]+"\nKeyword is "+word)
-#				break
-#			else:
-#				print(CURSOR_UP_ONE+ERASE_LINE+"\rKEYWORD TEST...",end="",flush=True)
-#	else:
-#		print("FAILED")
-#		print("RANDOM KEY TEST...")
-#		MAX_LENGTH = 4
-#		for length in range(1,MAX_LENGTH):
-#			if length > 1: 
-#				print("FAILED")
-#			print("\t",length,"LETTER WORDS...",end="",flush=True)
-#			for x in range(26**length):
-#				output = ""
-#				while x > 0:
-#					output += chr(97+x%26)
-#					x = x//26
-#				cipherAlphabet = key.fixDouble(bytearray(output[::-1] + "abcdefghijklmnopqrstuvwxyz","ascii"))
-#				decrypted = key.shift(cipher,cipherAlphabet)
-#				keyword = dictionary.recursiveCheck(str(decrypted,"utf-8").replace(" ",""))
-#				if keyword[0]:
-#					print("SUCCESS")
-#					print("is",keyword[1],"english? ",end="")
-#					if input()[0] == 'y':
-#						print("Keyword is",word)
-#						break
-#					else:
-#						print("RANDOM KEY TEST...",end="",flush=True)
+		s.shift(alphabet,tupleArray)
+		tupleArray.show(file=out)
+		alphabet.show()
+		print("The plaintext has been output to output.txt")
+	except Exception as e:
+		print("Unexpected Error in MAS Test:", e, file=log, flush=True) 	
+		print("FAILED")
+		print("KEYWORD TEST...",end="",flush=True)
+		words = set(twl.iterator())
+		for word in words:
+			cipherAlphabet = key.fixDouble(bytearray(word + "abcdefghijklmnopqrstuvwxyz","ascii"))
+			decrypted = key.shift(cipher,cipherAlphabet)
+			keyword = dictionary.recursiveCheck(str(decrypted,"utf-8").replace(" ",""))
+			if keyword[0]:
+				# see https://stackoverflow.com/questions/12586601/remove-last-stdout-line-in-python
+				CURSOR_UP_ONE = '\x1b[1A'
+				ERASE_LINE = '\x1b[2K'
+				print("is \"",keyword[1],"\" english? ",end="", sep="") 
+				if input()[0] == 'y':
+					print(CURSOR_UP_ONE+ERASE_LINE+"\rKEYWORD TEST...SUCCESS\n"+keyword[1]+"\nKeyword is "+word)
+					break
+				else:
+					print(CURSOR_UP_ONE+ERASE_LINE+"\rKEYWORD TEST...",end="",flush=True)
+					
+#		else:
+#			print("FAILED")
+#			print("RANDOM KEY TEST...")
+#			MAX_LENGTH = 4
+#			for length in range(1,MAX_LENGTH):
+#				if length > 1: 
+#					print("FAILED")
+#				print("\t",length,"LETTER WORDS...",end="",flush=True)
+#				for x in range(26**length):
+#					output = ""
+#					while x > 0:
+#						output += chr(97+x%26)
+#						x = x//26
+#					cipherAlphabet = key.fixDouble(bytearray(output[::-1] + "abcdefghijklmnopqrstuvwxyz","ascii"))
+#					decrypted = key.shift(cipher,cipherAlphabet)
+#					keyword = dictionary.recursiveCheck(str(decrypted,"utf-8").replace(" ",""))
+#					if keyword[0]:
+#						print("SUCCESS")
+#						print("is",keyword[1],"english? ",end="")
+#						if input()[0] == 'y':
+#							print("Keyword is",word)
+#							break
+#						else:
+#							print("RANDOM KEY TEST...",end="",flush=True)
