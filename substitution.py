@@ -1,7 +1,10 @@
 '''
 '''
+
+__debug = False
+
 from collections import namedtuple , Counter
-import copy
+import copy, sys
 import numpy as np
 import core,file
 from TWL06 import twl
@@ -33,13 +36,13 @@ class tupleArray:
 		wordTuple = namedtuple('wordTuple','word original length solved pattern')
 		for i,j in enumerate(wordList):
 			self.array[i] = wordTuple(word=bytearray(j),original=j,length=len(j),solved=np.array([False]*len(j)),pattern=pattern(j))
-	def show(self):
+	def show(self,file=sys.stdout):
 		for word in self.array:
 			for j,letter in enumerate(word.word):
-				if word.solved[j]: print(chr(letter).lower(),end="")
-				else: print(chr(letter).upper(),end="")
-			print(" ",end="")
-		print("\n",end="")
+				if word.solved[j]: print(chr(letter).lower(),end="",file=file)
+				else: print(chr(letter).upper(),end="",file=file)
+			print(" ",end="",file=file)
+		print("\n",end="",file=file)
 	def scrap(self):
 		for word in self.array:
 			for i in range(len(word.word)): word.word[i] = word.original[i]
@@ -104,20 +107,19 @@ class cipherAlphabet:
 				self.current[index][1] = True
 				done += bytes([cipher])
 		return 0					
-	def scrap(self):
+	def scrap(self,found=False):
 		for i,letter in enumerate(self.current):
 			if letter[1]: 
 				self.current[i] = [i+97,False]
+		if found: self.found = []
 	def fill(self):
 		missingCipher = []
 		for i,letter in enumerate(self.current):
 			if not letter[1]: missingCipher.append(i+97)
-		print(missingCipher)
 		for plain in range(97,123):
 			for i,cipher in enumerate(self.current):
 				if cipher[0] == plain and cipher[1]: break
 			else:
-				print(missingCipher[0]) 
 				self.set(bytes([plain]),bytes([missingCipher[0]]))
 				missingCipher = missingCipher[1:]
 		
@@ -132,12 +134,13 @@ def shift(alphabet,tupleArray):
 					if letter == cipher and word.solved[i] == False:
 						word.word[i] = plain
 						word.solved[i] = True 
+	return 0
 
 
 
 
 
-def recursiveSolve(words, tupleArray, accepted=[], recursionCounter = 0):
+def recursiveSolve(words, tupleArray, accepted=[], recursionCounter = 0,newWords=[]):
 	'''
 	It will recursively try all inputs given to it against all 
 	possibilities in the text, depending on repeated letter patterns, 
@@ -154,19 +157,31 @@ def recursiveSolve(words, tupleArray, accepted=[], recursionCounter = 0):
 	if len(words) == 0: return accepted
 	word = bytearray(words[0],"ascii")
 	alphabet = cipherAlphabet()
-	if recursionCounter == 0: alphabet.found += (accepted)
 	for i,solution in enumerate(wordPossibilities(word,tupleArray)):
 		tupleArray.scrap()
-		alphabet.scrap()
+		alphabet.scrap(found=True)
 		for plain,cipher in accepted: alphabet.set(plain,cipher)
 		if alphabet.set(word,solution) == 1: 
 			continue
 		else: 
 			shift(alphabet,tupleArray)
-			if tupleArray.simpleCheck()[0]:
-				maybeReturn = recursiveSolve(words[1:],tupleArray,accepted + [(word,solution)],recursionCounter+1)
-				if maybeReturn: 
-					return maybeReturn
+			check = tupleArray.simpleCheck()
+			if __debug: print(check[1])
+			if not check[0] and check[1].word in newWords: check[0] = True
+			if not check[0]:
+				if __debug: bool = True
+				else: bool = input("is "+str(check[1].word)+" a word? ")[0] == 'y'
+				CURSOR_UP_ONE = '\x1b[1A'
+				ERASE_LINE = '\x1b[2K'
+				print(CURSOR_UP_ONE+ERASE_LINE+"\r",end="")
+				if bool:
+					check[0] = True
+					newWords.append(check[1].word)
+			if check[0]: maybeReturn = recursiveSolve(words[1:],tupleArray,accepted + [(word,solution)],recursionCounter+1,newWords=newWords)
+			else: 
+				continue
+			if maybeReturn: 
+				return maybeReturn
 def flatten(L):
 	if L == None: yield None
 	for item in L:
@@ -190,25 +205,24 @@ def recursiveGuess(masterArray,alphabet,minWord=6,failCount=0,newWords=[]):
 				shift(alphabet,tupleArray)
 				check = tupleArray.simpleCheck()
 				if not check[0] and not check[1].word in newWords:
-					bool = input("is "+str(check[1].word)+" a word? ")[0] == 'y'
+					if __debug: bool = True
+					else: bool = input("is "+str(check[1].word)+" a word? ")[0] == 'y'
 					CURSOR_UP_ONE = '\x1b[1A'
 					ERASE_LINE = '\x1b[2K'
 					print(CURSOR_UP_ONE+ERASE_LINE+"\r",end="")
 					if bool:
-						newWords.append(check[1].word)
 						check[0] = True
-					else:
-						tupleArray = copy.deepcopy(masterArray)
-						continue
+						newWords.append(check[1].word)
 				if check[0]:
 					a = recursiveGuess(tupleArray,alphabet,minWord,failCount,newWords)
 					if a: 
-
 						return a
 					else: 
 						failCount += 1
 						break
-
+				else:
+					tupleArray = copy.deepcopy(masterArray)
+					continue
 	else: 
 		return masterArray
 	

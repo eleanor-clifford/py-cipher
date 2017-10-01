@@ -30,10 +30,13 @@ $ python3 test-all.py
 
 also, this will only format correctly in *nix based systems
 '''
+__debug = False
+
 import core, dictionary, key, file, substitution as s
 import copy
 from TWL06 import twl
-path = ""#input("Enter path of file to read from (cipher.txt): ")
+if __debug: path = ""
+else: path = input("Enter path of file to read from (cipher.txt): ")
 try:
 	cipher = file.openAsAscii(path)
 except FileNotFoundError: 
@@ -51,11 +54,13 @@ if affine:
 else:
 	print("FAILED")
 	print("MONOALPHABETIC SUBSTITUTION TEST...")
-	cribs = input("Please enter any cribs you know: ").split()
-	inputArray = cribs + ['the','and','for']
+	if __debug: cribs = []
+	else: cribs = input("Please enter any cribs you know: ").split()
+	inputArray = cribs + ['the','and']
 	tupleArray = s.tupleArray(cipher)
-	sol = sol = s.recursiveSolve(inputArray,tupleArray)
+	sol = s.recursiveSolve(inputArray,tupleArray)
 	alphabet = s.cipherAlphabet()
+	print(sol)
 	for i,j in sol:
 		alphabet.set(i,j)
 	s.shift(alphabet,tupleArray)
