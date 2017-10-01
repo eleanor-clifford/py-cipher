@@ -68,11 +68,12 @@ else:
 			alphabet.set(i,j)
 		s.shift(alphabet,tupleArray)
 		tupleArray = s.recursiveGuess(tupleArray,alphabet,minWord=6)
+		s.shift(alphabet,tupleArray)
 		tupleArray.show()
 		alphabet.show()
 		a = input("Enter any more letters you can see (or enter to fill alphabetically, x to proceed to the next text)").split()
 		print(a,file=log)
-		if len(a) > 0 and a[0].lower()[0] == 'x': pass#raise Exception
+		if len(a) > 0 and a[0].lower()[0] == 'x': raise Exception
 		if len(a) == 2:
 			alphabet.set(bytearray(a[0],"ascii"),bytearray(a[1],"ascii"))
 			if input("Fill also? ")[0] == 'y':
