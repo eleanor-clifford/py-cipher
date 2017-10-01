@@ -58,7 +58,7 @@ else:
 	try:
 		print("FAILED")
 		print("MONOALPHABETIC SUBSTITUTION TEST...")
-		if __debug: cribs = []
+		if __debug: cribs = ['dynamix','charlie','destruction']
 		else: cribs = input("Please enter any cribs you know: ").split()
 		inputArray = cribs + ['the','and']
 		tupleArray = s.tupleArray(cipher)
@@ -69,8 +69,11 @@ else:
 		s.shift(alphabet,tupleArray)
 		tupleArray = s.recursiveGuess(tupleArray,alphabet,minWord=6)
 		s.shift(alphabet,tupleArray)
+		alphabet = s.finalCheck(tupleArray,alphabet)
+		s.shift(alphabet,tupleArray)
 		tupleArray.show()
 		alphabet.show()
+
 		a = input("Enter any more letters you can see (or enter to fill alphabetically, x to proceed to the next text)").split()
 		print(a,file=log)
 		if len(a) > 0 and a[0].lower()[0] == 'x': raise Exception

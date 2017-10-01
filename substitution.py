@@ -257,3 +257,21 @@ def recursiveCheck(masterTuple,alphabet,found=None):
 			if a: returnValue.append(a)
 	return returnValue
 	
+
+def finalCheck(tupleArray, alphabet): 
+	'''
+	This occurs when a letter is missed because it only occurs at the start of the word,
+	where recursiveCheck misses it as it cannot be checked directly using twl
+	'''
+	for word in tupleArray.array:
+		if (not word.solved[0]) and len(word.solved) > 1 and not ( False in word.solved[1:]):
+			possible = []
+			orig = word.word[0]
+			for l in range(26):
+				word.word[0] = l+97
+				if twl.check(str(word.word,"utf-8")):
+					possible.append((bytes([l+97]),bytes([orig+32])))
+			if len(possible) == 1:
+				alphabet.set(possible[0][0],possible[0][1])
+			word.word[0] = orig
+	return alphabet
