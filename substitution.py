@@ -31,7 +31,7 @@ def pattern(word,utf8=False):
 class tupleArray:
 	array = np.empty([])
 	def __init__(self,cipher):
-		wordList = cipher.split(bytes([ord(" ")]))
+		wordList = cipher.strip().split(bytes([ord(" ")]))
 		self.array = np.empty(len(wordList),dtype=tuple)
 		wordTuple = namedtuple('wordTuple','word original length solved pattern')
 		for i,j in enumerate(wordList):
@@ -264,7 +264,7 @@ def finalCheck(tupleArray, alphabet):
 	where recursiveCheck misses it as it cannot be checked directly using twl
 	'''
 	for word in tupleArray.array:
-		if (not word.solved[0]) and len(word.solved) > 1 and not ( False in word.solved[1:]):
+		if (len(word.solved) > 1 and not word.solved[0]) and not ( False in word.solved[1:]):
 			possible = []
 			orig = word.word[0]
 			for l in range(26):

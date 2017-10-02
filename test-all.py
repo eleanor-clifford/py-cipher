@@ -58,7 +58,7 @@ else:
 	try:
 		print("FAILED")
 		print("MONOALPHABETIC SUBSTITUTION TEST...")
-		if __debug: cribs = ['dynamix','charlie','destruction']
+		if __debug: cribs = ['harry,']
 		else: cribs = input("Please enter any cribs you know: ").split()
 		inputArray = cribs + ['the','and']
 		tupleArray = s.tupleArray(cipher)
