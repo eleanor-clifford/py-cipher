@@ -34,7 +34,7 @@ def frequencyList(input1,utf8=False):
 				if ord(i) == letter: tempFrequency += 1
 			elif i == letter:
 				tempFrequency += 1
-		cipherLetterFrequency.append((tempFrequency) / len(input1))
+		cipherLetterFrequency.append((tempFrequency))
 	return cipherLetterFrequency
 
 def sortLinear(function, list1, a, b, cipherLetterFrequency):
@@ -51,8 +51,10 @@ def sortLinear(function, list1, a, b, cipherLetterFrequency):
 	for param1 in a:
 		for param2 in b:
 			tempPossibility = 0
-			for letter in range(26):
-				tempPossibility += cipherLetterFrequency[(function(letter,param1,param2))%26] * letterFrequency[letter]
+			for letter in list1:
+				if 65 <= letter <= 90:
+					newLetter = (function(letter-65,param1,param2))%26
+					tempPossibility += letterFrequency[newLetter]
 			shiftPossibility.append(tempPossibility)
 			paramList.append((param1,param2))
 	return [(a,b) for _,(a,b) in sorted(zip(shiftPossibility, paramList))][::-1]
@@ -71,7 +73,7 @@ def shiftLinear(function, list1, a, b, utf8=False):
 			if ord(i) < 97 or ord(i) > 122:
 				newInput += i
 			else:		
-				newInput += chr((function(ord(i),a,b) - 97) % 26 + 97)
+				newInput += chr((function(ord(i)-97,a,b) % 26 + 97))
 		return newInput
 	else:
 		newInput = bytearray("","ascii")
@@ -79,6 +81,6 @@ def shiftLinear(function, list1, a, b, utf8=False):
 			if i < 97 or i > 122:
 				newInput += bytes([i])
 			else:		
-				newInput += bytes([(function(i,a,b) - 97) % 26 + 97])
+				newInput += bytes([(function(i-97,a,b)) % 26 + 97])
 		return newInput
 

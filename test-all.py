@@ -5,45 +5,49 @@ Uses the core and dictionary modules to test for Affine ciphers (includes Caesar
 
 Sample Usage
 $ ./test-all.py
-ZGGZX PZGWZ DM
+ZGG ZXP ZGW ZDM
 AFFINE TEST...SUCCESS
-attack at dawn
 D(x): x -> 25(x-11) mod 26
+The plaintext has been output to output.txt
+Show output? y
+attack at dawn
 
 $ ./test-all.py
 TSCRC RPFBY WKQAI CMSBQ
 AFFINE TEST...FAILED
+MONOALPHABETIC SUBSTITUTION TEST...FAILED
 KEYWORD TEST...SUCCESS
-this is a keyword cipher
+The plaintext has been output to output.txt
 Keyword is pliablenesses
+Show output? y
+this is a keyword cipher
 
-As the decryption is tested against a number of obscure words there can sometimes be (especially for short ciphers)
-a decryption which is technically correct english, but makes no sense. For this reason, in keyword test, 
-the user will sometimes be prompted to ask whether a string is english. After answering the question is cleared from 
-stdout (using VT100 control codes) and the program carries on. It is recommended to run the program directly from a 
-terminal as the control codes do not format properly otherwise, i.e use
-
-$ chmod +x test-all.py
-$ ./test-all.py
-or
-$ python3 test-all.py
-
-also, this will only format correctly in *nix based systems
 '''
-__debug = False
+__debug = True
 
 import core, dictionary, key, file, substitution as s
-import copy
+import copy, string
 from TWL06 import twl
+
+# see https://stackoverflow.com/questions/12586601/remove-last-stdout-line-in-python
+CURSOR_UP_ONE = '\x1b[1A'
+ERASE_LINE = '\x1b[2K'
+
 if __debug: path = ""
 else: path = input("Enter path of file to read from (cipher.txt): ")
+if path == "": path = "cipher.txt"
+print(CURSOR_UP_ONE+ERASE_LINE+"\r",end="")
 try:
 	cipher = file.openAsAscii(path)
+	print("Reading from",path+"...")
 except FileNotFoundError: 
 	cipher = bytes(input("File not found. Enter cipher:\n"),"ascii")
+	print(CURSOR_UP_ONE+ERASE_LINE+CURSOR_UP_ONE+ERASE_LINE+"\r"+str(cipher,"utf-8"))
 out = open("output.txt","w")
 log = open("errorlog.txt","w")
 
+translator = str.maketrans('', '', string.punctuation)
+cipher = bytearray(str(cipher,"utf-8").translate(translator),"ascii")
 COPRIMES = [1,3,5,7,9,11,15,17,19,21,23,25] # coprimes of 26 - the modular multiplicative inverse is the same set
 f = core.frequencyList(cipher)
 print("AFFINE TEST...",end="")
@@ -54,6 +58,9 @@ if affine:
 	print(affine[0],file=out)
 	print("D(x): x -> ",affine[1][0],"(x","-",affine[1][1],") mod 26",sep="")
 	print("The plaintext has been output to output.txt")
+	try:
+		if input("Show output? ")[0] == 'y': print(affine[0])
+	except IndexError: pass
 else:
 	try:
 		print("FAILED")
@@ -89,7 +96,7 @@ else:
 		print("The plaintext has been output to output.txt")
 	except Exception as e:
 		print("Unexpected Error in MAS Test:", e, file=log, flush=True) 	
-		print("FAILED")
+		print(CURSOR_UP_ONE+ERASE_LINE+"\r"+CURSOR_UP_ONE+ERASE_LINE+"\rMONOALPHABETIC SUBSTITUTION TEST...FAILED")
 		print("KEYWORD TEST...",end="",flush=True)
 		words = set(twl.iterator())
 		for word in words:
@@ -97,12 +104,14 @@ else:
 			decrypted = key.shift(cipher,cipherAlphabet)
 			keyword = dictionary.recursiveCheck(str(decrypted,"utf-8").replace(" ",""))
 			if keyword[0]:
-				# see https://stackoverflow.com/questions/12586601/remove-last-stdout-line-in-python
-				CURSOR_UP_ONE = '\x1b[1A'
-				ERASE_LINE = '\x1b[2K'
 				print("is \"",keyword[1],"\" english? ",end="", sep="") 
 				if input()[0] == 'y':
-					print(CURSOR_UP_ONE+ERASE_LINE+"\rKEYWORD TEST...SUCCESS\n"+keyword[1]+"\nKeyword is "+word)
+					print(CURSOR_UP_ONE+ERASE_LINE+"\rKEYWORD TEST...SUCCESS")
+					print(keyword[1],file=out)
+					print("The plaintext has been output to output.txt\nKeyword is "+word)
+					try:
+						if input("Show output? ")[0] == 'y': print(keyword[1])
+					except IndexError: pass
 					break
 				else:
 					print(CURSOR_UP_ONE+ERASE_LINE+"\rKEYWORD TEST...",end="",flush=True)

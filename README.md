@@ -8,18 +8,23 @@ A few common tools for classical cipher cracking, implemented in Python 3. Uses 
 ### Common Usage:
 
 ##### Test All:
-	$ ./test-all.py
+	$ python3 test-all.py
 	ZGG ZXP ZGW ZDM
 	AFFINE TEST...SUCCESS
-	attack at dawn
 	D(x): x -> 25(x-11) mod 26
+	The plaintext has been output to output.txt
+	Show output? y
+	attack at dawn
 	
-	$ ./test-all.py
+	$ python3 test-all.py
 	TSCRC RPFBY WKQAI CMSBQ
 	AFFINE TEST...FAILED
+	MONOALPHABETIC SUBSTITUTION TEST...FAILED
 	KEYWORD TEST...SUCCESS
-	this is a keyword cipher
+	The plaintext has been output to output.txt
 	Keyword is pliablenesses
+	Show output? y
+	this is a keyword cipher
 
 ### Core module
 
@@ -55,19 +60,9 @@ Sample Usage:
 
  - Affine ciphers (which includes Caesar shifts and Atbash ciphers)
  - Keyword ciphers where the keyword is a member of the TWL06 scrabble dictionary
- - Random keyword ciphers (slow)
+ - All monoalphabetic ciphers as long as the word spacing is consistent with the plaintext
 
-As the decryption is tested against a number of obscure words there can sometimes be (especially for short ciphers)
-a decryption which is technically correct english, but makes no sense. For this reason, in keyword test, 
-the user will sometimes be prompted to ask whether a string is english. After answering the question is cleared from 
-stdout (using VT100 control codes) and the program carries on. It is recommended to run the program directly from a 
-terminal as the control codes do not format properly otherwise, i.e use
-
-	$ chmod +x test-all.py
-	$ ./test-all.py
-
-or
-
-	$ python3 test-all.py
-
-also, this will only format correctly in *nix based systems
+The program prompts the user several times during the tests for input (i.e.) is this english? 
+can you see any more letters to solve? etc. In order to keep stdout relatively tidy, VT100 Control codes are used to
+clear some lines after input. However these do not format properly in some environments (basically non unix-like systems.)
+On a *nix system, this program is best run on a CLI in order for the control codes to work. 

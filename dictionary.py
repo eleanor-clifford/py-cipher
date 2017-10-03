@@ -14,6 +14,7 @@ Depends: cipher.core.shiftLinear, twl
 '''
 from TWL06 import twl
 from core import shiftLinear
+__debug = True
 
 def filterIgnoreSpace(function,cipher,sortedShiftList,utf8=False):
 	'''
