@@ -52,7 +52,22 @@ COPRIMES = [1,3,5,7,9,11,15,17,19,21,23,25] # coprimes of 26 - the modular multi
 f = core.frequencyList(cipher)
 print("AFFINE TEST...",end="")
 affineShiftList = core.sortLinear(lambda x, a, b: a*(x - b), cipher, COPRIMES, range(26), f)
-affine = dictionary.filterIgnoreSpace(lambda x, a, b: a*(x - b),cipher,affineShiftList)
+affine = dictionary.filterIgnoreSpace(lambda x, a, b: a# see https://stackoverflow.com/questions/12586601/remove-last-stdout-line-in-python
+CURSOR_UP_ONE = '\x1b[1A'
+ERASE_LINE = '\x1b[2K'
+
+if __debug: path = ""
+else: path = input("Enter path of file to read from (cipher.txt): ")
+if path == "": path = "cipher.txt"
+print(CURSOR_UP_ONE+ERASE_LINE+"\r",end="")
+try:
+	cipher = file.openAsAscii(path)
+	print("Reading from",path+"...")
+except FileNotFoundError: 
+	cipher = bytes(input("File not found. Enter cipher:\n"),"ascii")
+	print(CURSOR_UP_ONE+ERASE_LINE+CURSOR_UP_ONE+ERASE_LINE+"\r"+str(cipher,"utf-8"))
+out = open("output.txt","w")
+log = open("errorlog.txt","w")*(x - b),cipher,affineShiftList)
 if affine: 
 	print("SUCCESS")
 	print(affine[0],file=out)
