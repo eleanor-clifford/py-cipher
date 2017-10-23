@@ -122,6 +122,22 @@ import itertools
 import struct
 import zlib
 
+addedWords = set()
+with open("addedWords.txt","r") as f:
+    [addedWords.add(a.replace("\n","")) for a in f.readlines()]
+
+def add(word):
+    '''
+    Add a word to the dictionary
+    (less efficient than the DAWG)
+    '''
+    word = word.lower()
+    if type(word) == type(""): 
+        addedWords.add(word)
+        with open("addedWords.txt","a") as f: f.write(word+"\n")
+    else: 
+        addedWords.add(str(word,"utf-8"))
+        with open("addedWords.txt","a") as f: f.write(str(word,"utf-8")+"\n")
 def check(word):
     '''
     Returns True if `word` exists in the TWL06 dictionary.
@@ -132,7 +148,7 @@ def check(word):
     >>> twl.check('asdf')
     False
     '''
-    return word in _DAWG
+    return word in _DAWG or word in addedWords
 
 def iterator():
     '''
@@ -153,7 +169,8 @@ def children(prefix):
     '''
     Returns a list of letters that may appear after `prefix`.
     '''
-    return _DAWG.children(prefix)
+    return _DAWG.children(prefix) 
+    + [word[len(prefix)] for word in addedWords if len(word) > 1 and word[:len(prefix)] == prefix]
 
 def anagram(letters):
     '''

@@ -59,9 +59,12 @@ def recursiveCheck(cipher,index=0,length=1,partialSolution=''):
 			return recursiveCheck(cipher,index+length,1,partialSolution+word+" ")
 	elif twl.check(longerWord) or len(twl.children(longerWord)) > 0:
 		if index+length > len(cipher) - 1: 
+			#print(partialSolution)
 			return False,""
 		return recursiveCheck(cipher,index,length+1,partialSolution)
 	else: 
+		#print(partialSolution)
 		return False,""
 
 def partialCheck(): raise NotImplementedError
+

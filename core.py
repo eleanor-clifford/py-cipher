@@ -83,4 +83,3 @@ def shiftLinear(function, list1, a, b, utf8=False):
 			else:		
 				newInput += bytes([(function(i-97,a,b)) % 26 + 97])
 		return newInput
-

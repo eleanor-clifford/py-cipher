@@ -78,17 +78,17 @@ class cipherAlphabet:
 		for i,letter in enumerate(bytearray("abcdefghijklmnopqrstuvwxyz","ascii")):
 			self.current[i] = [letter,False]		
 	found = []
-	def show(self):
-		for i in range(26): print(chr(97+i),end=" ")
+	def show(self,file=sys.stdout):
+		for i in range(26): print(chr(97+i),end=" ",file=file)
 		output = np.zeros(26,dtype=int)
 		for i,letter in enumerate(self.current):
 			if letter[1]: output[letter[0] - 97] = i + 65
-		print()
+		print(file=file)
 		for i in output:
 			if i != 0:
-				print(chr(i),end=" ")
-			else: print(" ",end=" ")
-		print()
+				print(chr(i),end=" ",file=file)
+			else: print(" ",end=" ",file=file)
+		print(file=file)
 	def set(self,plaintext,ciphertext):
 		done = bytearray("","ascii")
 		### CHECK:
@@ -175,6 +175,7 @@ def recursiveSolve(words, tupleArray, accepted=[], recursionCounter = 0,newWords
 				ERASE_LINE = '\x1b[2K'
 				print(CURSOR_UP_ONE+ERASE_LINE+"\r",end="")
 				if bool:
+					twl.add(check[1].word)
 					check[0] = True
 					newWords.append(check[1].word)
 			if check[0]: maybeReturn = recursiveSolve(words[1:],tupleArray,accepted + [(word,solution)],recursionCounter+1,newWords=newWords)
@@ -211,6 +212,7 @@ def recursiveGuess(masterArray,alphabet,minWord=6,failCount=0,newWords=[]):
 					ERASE_LINE = '\x1b[2K'
 					print(CURSOR_UP_ONE+ERASE_LINE+"\r",end="")
 					if bool:
+						twl.add(check[1].word)
 						check[0] = True
 						newWords.append(check[1].word)
 				if check[0]:
