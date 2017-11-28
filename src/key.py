@@ -1,6 +1,6 @@
 '''
 '''
-from TWL06 import twl
+from src.TWL06 import twl
 
 def shift(cipher,cipherAlphabet,utf8=False):
 	cipher = cipher.lower()

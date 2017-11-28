@@ -12,8 +12,12 @@ Sample Usage:
 
 Depends: cipher.core.shiftLinear, twl
 '''
-from TWL06 import twl
-from core import shiftLinear
+try:
+	from src.TWL06 import twl
+	from src.core import shiftLinear
+except ImportError:
+	from TWL06 import twl
+	from core import shiftLinear
 __debug = True
 
 def filterIgnoreSpace(function,cipher,sortedShiftList,utf8=False):
@@ -60,7 +64,7 @@ def recursiveCheck(cipher,index=0,length=1,partialSolution=''):
 	elif twl.check(longerWord) or len(twl.children(longerWord)) > 0:
 		if index+length > len(cipher) - 1: 
 			#print(partialSolution)
-			return False,""
+			return True,(partialSolution+word)
 		return recursiveCheck(cipher,index,length+1,partialSolution)
 	else: 
 		#print(partialSolution)

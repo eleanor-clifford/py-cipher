@@ -1,13 +1,10 @@
 #!/bin/env python3
-import core,file,tests
-from TWL06 import twl
+from src import core,file,tests,vigenere; from src.TWL06 import twl
 import tkinter as tk
-import matplotlib, numpy, sys, math
-matplotlib.use('TkAgg')
+import string
+import matplotlib, numpy, sys, math; matplotlib.use('TkAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
-import string
-
 root = tk.Tk()
 
 class Start:
@@ -41,8 +38,10 @@ class Start:
 			frame.pack(side=tk.LEFT)
 			basic = BasicAnalysis(root,cipher)
 			tests = Tests(root,cipher)
-			#divisors = Divisors(frame,cipher)
-			#test = Test(frame)
+			if not IGNORE_POLY:
+				poly = PolyAnalysis(root,cipher)
+				divisors = Divisors(frame,cipher)
+				test = Test(frame)
 
 		except FileNotFoundError: self.path.set("File Not Found")
 	
@@ -51,11 +50,15 @@ class BasicAnalysis:
 		frame = tk.Frame(master)
 		frame.pack(side=tk.LEFT)
 		
+		#a = open("splits.txt").read().split("\n")
+		#print("\n".join(a))
+		#self.cipher = bytearray(a[3],"ascii")
 		self.cipher = cipher
 		frequency = core.frequencyList(self.cipher)
+		#print(max(frequency))
 		frequency = [100 * (a / sum(frequency)) for a in frequency]
 		meanFrequency = [8.17, 1.49, 2.78, 4.25, 12.7, 2.23, 2.02, 6.09, 6.97, 0.15, 0.77, 4.02, 2.41, 6.75, 7.51, 1.93, 0.09, 5.99, 6.33, 9.06, 2.76, 0.98, 2.36, 0.15, 1.97, 0.07]
-		
+		#meanFrequency = core.frequencyList(bytearray(a[1],"ascii"))
 		
 		f = Figure(figsize=(5,4), dpi=100)
 		ax = f.add_subplot(111)
@@ -86,6 +89,75 @@ class BasicAnalysis:
 		divisors = [a for a in range(1,length+1) if length % a == 0]
 		divLabel = tk.Label(frame,text="Divisors: {0}".format(divisors))
 		divLabel.pack()
+		'''
+		a,b = vigenere.kasiski(self.cipher)
+		ksLabel = tk.Label(frame,text="Kasiski: {0} from {1} matches".format(a,b))
+		ksLabel.pack()
+		'''
+class PolyAnalysis:
+	def __init__(self,master,cipher):
+		self.frame = tk.Frame(master)
+		self.frame.pack(side=tk.LEFT)
+		self.cipher = cipher
+		
+		self.info()
+		self.graph()
+	def graph(self):	
+		f = Figure(figsize=(5,4), dpi=100)
+		ax = f.add_subplot(111)
+		ind = numpy.arange(26)
+		width = .35
+		with open("splits.txt") as file:
+			split_ = file.readline()[:-1]
+			split_ = file.readline()[:-1]
+			split_ = file.readline()[:-1]
+			print(len(split_))
+			split_ = file.readline()[:-1]			
+			
+			split0 = file.readline()[:-1]
+			split1 = file.readline()[:-1]
+		
+		frequency0 = core.frequencyList(bytearray(split0,"ascii"))
+		frequency1 = core.frequencyList(bytearray(split1,"ascii"))
+		frequency0 = [100 * (a / sum(frequency0)) for a in frequency0]
+		frequency1 = [100 * (a / sum(frequency1)) for a in frequency1]		
+		#print(frequency0)
+
+		rects0 = ax.bar(ind, frequency0, width, color="r")
+		rects1 = ax.bar(ind + width, frequency1, width, color="g")
+		ax.set_title("Letter Frequency")
+		ax.set_ylabel('Percentage of text')
+		ax.set_xticks(ind)
+		ax.set_xticklabels([a for a in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"])
+		ax.legend((rects0[0], rects0[0]), ('Split 0', 'Split 1'))
+
+		canvas = FigureCanvasTkAgg(f, master=self.frame)
+		canvas.show()
+		canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+		
+
+	def info(self):
+		with open("splits.txt","w"): pass
+		frame = tk.Frame(self.frame)
+		frame.pack()
+		infoText = tk.Text(frame)
+		infoText.pack()
+
+		keylength,matches = vigenere.kasiskiNoSpace(self.cipher)
+		formatter = "\tLength {:d}: {:s}\n"*len(keylength)
+		vanillaVigenereKeys = [[k,vigenere.freqAnalysis(length=k,ciphertext=self.cipher)] for k in keylength]
+		infoText.insert(tk.INSERT,
+				"Basic Vigenere Key (from {:d} matches)\n".format(matches)
+				+formatter.format(*sum(vanillaVigenereKeys,[])))
+		infoText.insert(tk.INSERT,"\n")
+		vigenereAlignKeys = [[k,vigenere.align(splits=splits.split("\n"))] 
+				for k,splits in zip(keylength,open("splits.txt").read().split("\n\n"))]
+		infoText.insert(tk.INSERT,
+				"Vigenere Alignment Key (from {:d} matches)\n".format(matches)
+				+formatter.format(*sum(vigenereAlignKeys,[])))
+
+		infoText.config(state=tk.DISABLED)
 
 class Tests:
 	def __init__(self, master, cipher):
@@ -106,7 +178,11 @@ class Tests:
 
 		self.alphabetText = tk.Text(self.frame, height=2, width=52)
 		
+		self.vigenere = tk.Button(self.frame,text="Vigenere", command=self.SetupVigenere)
+		self.vigenere.pack()
 
+		self.hill = tk.Button(self.frame,text="Hill", command = self.Hill)
+		self.hill.pack()
 	def Affine(self):
 		cipherStart = bytearray("".join([str(a,"utf-8") for a in self.cipher.split()[:10]]),"ascii")
 		success,a,b = tests.affine(cipherStart)
@@ -135,10 +211,6 @@ class Tests:
 		cribsEntry = tk.Entry(subFrame, textvariable=self.cribs)
 		cribsEntry.pack(side=tk.LEFT)
 		
-
-		
-		
-
 		self.mas.config(command=self.MAS)
 	def MAS(self):
 		self.tupleArray, self.alphabet = tests.mas(self.cipher,self.cribs.get().split())
@@ -175,61 +247,33 @@ class Tests:
 			self.outputText.insert(tk.END,"".join(out.readlines()))
 		self.outputText.pack()
 
-
-
-		
-
-
-
-'''
-class Test:
-	def __init__(self, master):
-		frame = tk.Frame(master)
+	def SetupVigenere(self):
+		frame = tk.Frame(self.frame)
 		frame.pack()
-		# create a menu
-		menu = tk.Menu(master)
-		master.config(menu=menu)
+		subFrame = tk.Frame(frame)
+		subFrame.pack()
+		prompt = tk.Label(subFrame,text="Key: ")
+		prompt.pack(side=tk.LEFT)
+		self.key = tk.StringVar()
+		cribsEntry = tk.Entry(subFrame, textvariable=self.key)
+		cribsEntry.pack(side=tk.LEFT)
 
-		filemenu = tk.Menu(menu)
-		menu.add_cascade(label="File", menu=filemenu)
-		filemenu.add_command(label="New", command=self.callback)
-		filemenu.add_command(label="Open...", command=self.callback)
-		filemenu.add_separator()
-		filemenu.add_command(label="Exit", command=self.callback)
+		self.vigenere.config(command=self.Vigenere)
 
-		helpmenu = tk.Menu(menu)
-		menu.add_cascade(label="Help", menu=helpmenu)
-		helpmenu.add_command(label="About...", command=self.callback)
-
-	def callback(self): print("eh")
-'''
-
-
+	def Vigenere(self):
+		vigenere.decrypt(keyword=bytearray(self.key.get().upper(),"ascii"),ciphertext=self.cipher)
+		self.outputText = tk.Text(tk.Toplevel())
+		with open("output.txt","r") as out:
+			self.outputText.insert(tk.END,"".join(out.readlines()))
+		self.outputText.pack()
+	def Hill(self):
+		if tests.hill(self.cipher):
+			self.outputText = tk.Text(tk.Toplevel())
+			with open("output.txt","r") as out:
+				self.outputText.insert(tk.END,"".join(out.readlines()))
+			self.outputText.pack()
+IGNORE_POLY = False
+for i in sys.argv:
+	if i == "--ignore-poly": IGNORE_POLY = True
 start = Start(root)
 root.mainloop()
-
-'''
-path = input("Enter path of file to read from (cipher.txt): ")
-if path == "": path = "cipher.txt"
-
-try:
-	cipher = file.openAsAscii(path)
-	print("Reading from",path+"...")
-except FileNotFoundError: 
-	cipher = bytes(input("File not found. Enter cipher:\n"),"ascii")
-	print(CURSOR_UP_ONE+ERASE_LINE+CURSOR_UP_ONE+ERASE_LINE+"\r"+str(cipher,"utf-8"))
-
-out = open("output.txt","w")
-log = open("errorlog.txt","w")
-
-frequency = core.frequencyList(cipher)
-print("Letter Frequency")
-[print(chr(i+65),": ",j,sep="") for i,j in enumerate(frequency)]
-
-length = len(cipher)
-divisors = [x for x in range(1,length+1) if length % x == 0]
-print("Divisors:",end=" ")
-[print(a,end=" ") for a in divisors]
-print()
-
-'''

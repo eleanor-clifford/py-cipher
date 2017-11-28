@@ -58,7 +58,7 @@ def sortLinear(function, list1, a, b, cipherLetterFrequency):
 			shiftPossibility.append(tempPossibility)
 			paramList.append((param1,param2))
 	return [(a,b) for _,(a,b) in sorted(zip(shiftPossibility, paramList))][::-1]
-
+	
 def shiftLinear(function, list1, a, b, utf8=False):
 	'''
 	Shifts a given string by the function and two input values `a` and `b`

@@ -1,5 +1,5 @@
-import core, dictionary, substitution as s
-from TWL06 import twl
+from src import core, dictionary, substitution as s, hill as h
+from src.TWL06 import twl
 import tkinter as tk
 import string
 
@@ -71,3 +71,12 @@ def keyword(cipher):
 			else:
 				print(CURSOR_UP_ONE+ERASE_LINE+"\rKEYWORD TEST...",end="",flush=True)
 					
+def hill(cipher):
+	with open("output.txt","w") as out:
+		flag = False
+		for n in range(2,3):
+			for i in h.crack(N=n,ciphertext=cipher):
+				if i: 
+					print(i,file=out)
+					flag = True
+		return flag
