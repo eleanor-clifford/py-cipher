@@ -22,7 +22,7 @@ def solve(dkey, N, ciphertext):
 			return (dkey,solved)
 		else: return
 
-def frequencyAnalysisWithC(N=4, ciphertext=file.openAsAscii("cipher-2016-7B.txt")):
+def frequencyAnalysisWithC(N, ciphertext):
 	'''
 	Runs in O(26^N) time but the C speed is legendary
 	2x2:  0.29s

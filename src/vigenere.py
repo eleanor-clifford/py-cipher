@@ -2,8 +2,7 @@ try: import core, file
 except ImportError: from src import core,file 
 import string
 
-def friedman():
-	ciphertext = file.openAsAscii("cipher.txt")
+def friedman(ciphertext):
 	kp = 0.067
 	kr = 1/26
 	N = sum(core.frequencyList(ciphertext))
@@ -14,7 +13,7 @@ def friedman():
 	keylength = (kp-kr)/(ko-kr)
 
 	return (keylength)
-def decrypt(keyword = bytearray("TEST","ascii"),ciphertext = file.openAsAscii("cipher.txt")):
+def decrypt(keyword,ciphertext):
 	#print(keyword)
 	#keyword = keyword.upper()
 	index = 0
@@ -32,7 +31,7 @@ def decrypt(keyword = bytearray("TEST","ascii"),ciphertext = file.openAsAscii("c
 
 
 
-def kasiski(ciphertext = file.openAsAscii("cipher.txt")):
+def kasiski(ciphertext):
 	ciphertext = str(ciphertext,"ascii")
 	translator = str.maketrans('', '', string.punctuation)
 	ciphertext = ciphertext.translate(translator).split()
@@ -56,7 +55,7 @@ def kasiski(ciphertext = file.openAsAscii("cipher.txt")):
 	#factors = set([x for _,x in sorted([(factors.count(a),a) for a in factors])])
 	return factors,matches
 
-def kasiskiNoSpace(ciphertext = file.openAsAscii("cipher.txt")):
+def kasiskiNoSpace(ciphertext):
 	ciphertext = str(ciphertext,"ascii")
 	translator = str.maketrans('', '', string.punctuation)
 	ciphertext = ciphertext.translate(translator).replace(" ","")
@@ -79,7 +78,7 @@ def kasiskiNoSpace(ciphertext = file.openAsAscii("cipher.txt")):
 	#factors = set([x for _,x in sorted([(factors.count(a),a) for a in factors])])
 	return factors,matches
 
-def freqAnalysis(length=7, ciphertext = file.openAsAscii("cipher.txt")):
+def freqAnalysis(length, ciphertext):
 	translator = str.maketrans('', '', string.punctuation)
 	ciphertext = bytearray(str(ciphertext,"ascii").translate(translator).replace(" ","").replace("\n",""),"ascii")
 	split = []
@@ -93,7 +92,8 @@ def freqAnalysis(length=7, ciphertext = file.openAsAscii("cipher.txt")):
 	open("splits.txt","a").write("\n")
 	return str(keyword,"utf-8")
 
-def align(splits=[a[:-1] for a in open("splits.txt").readlines()]):
+def align(splits):
+	#splits = [a[:-1] for a in open("splits.txt").readlines()]
 	#print(splits[0])
 	baseFrequency = core.frequencyList(bytearray(splits[0],"ascii"))
 	#print(baseFrequency)
