@@ -74,7 +74,7 @@ def keyword(cipher):
 def hill(cipher):
 	with open("output.txt","w") as out:
 		flag = False
-		for n in range(2,5):
+		for n in range(2,4):
 			for i in h.frequencyAnalysisWithC(N=n,ciphertext=cipher):
 				if i: 
 					print(i,file=out)

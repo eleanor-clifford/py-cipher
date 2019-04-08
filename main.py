@@ -5,7 +5,10 @@ import string
 import matplotlib, numpy, sys, math; matplotlib.use('TkAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
+import IPython
+import multiprocessing as mp
 root = tk.Tk()
+LOG = "log.txt"
 
 class Start:
 	def __init__(self,master):
@@ -33,7 +36,6 @@ class Start:
 	def Analyse(self):
 		try:
 			cipher = file.openAsAscii(self.path.get())
-			
 			frame = tk.Frame()
 			frame.pack(side=tk.LEFT)
 			basic = BasicAnalysis(root,cipher)
@@ -43,7 +45,9 @@ class Start:
 				divisors = Divisors(frame,cipher)
 				test = Test(frame)
 
-		except FileNotFoundError: self.path.set("File Not Found")
+		except FileNotFoundError:
+			self.path.set("File Not Found")
+			open(LOG,"a").write("File Not Found\n")
 	
 class BasicAnalysis:
 	def __init__(self,master,cipher):
@@ -55,6 +59,7 @@ class BasicAnalysis:
 		#self.cipher = bytearray(a[3],"ascii")
 		self.cipher = cipher
 		frequency = core.frequencyList(self.cipher)
+		open(LOG,"a").write("Frequency: {0}\n".format(frequency))
 		#print(max(frequency))
 		frequency = [100 * (a / sum(frequency)) for a in frequency]
 		meanFrequency = [8.17, 1.49, 2.78, 4.25, 12.7, 2.23, 2.02, 6.09, 6.97, 0.15, 0.77, 4.02, 2.41, 6.75, 7.51, 1.93, 0.09, 5.99, 6.33, 9.06, 2.76, 0.98, 2.36, 0.15, 1.97, 0.07]
@@ -78,6 +83,7 @@ class BasicAnalysis:
 		canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
 		stdDevCipher = math.sqrt(sum([a**2 for a in frequency])/26 - (sum(frequency)/26)**2)
+		open(LOG,"a").write("Standard Deviation of Frequency: {0}\n".format(stdDevCipher))
 		stdDevMean = math.sqrt(sum([a**2 for a in meanFrequency])/26 - (sum(meanFrequency)/26)**2)
 		
 		self.stdDev = tk.Label(frame,text="Standard Deviation - Ciphertext {ciphertext:.{digits}f}, English Mean {mean:.{digits}f}"
@@ -87,6 +93,7 @@ class BasicAnalysis:
 		translator = str.maketrans('', '', string.punctuation)
 		length = len(str(cipher,"utf-8").replace("\t","").replace("\n","").replace(" ","").translate(translator))
 		divisors = [a for a in range(1,length+1) if length % a == 0]
+		open(LOG,"a").write("Length Divisors: {0}\n".format(divisors))
 		divLabel = tk.Label(frame,text="Divisors: {0}".format(divisors))
 		divLabel.pack()
 		'''
@@ -261,6 +268,8 @@ class Tests:
 		self.vigenere.config(command=self.Vigenere)
 
 	def Vigenere(self):
+		open(LOG,"a").write(self.key.get().upper()+"\n")
+		open(LOG,"a").write(str(self.cipher)+"\n")
 		vigenere.decrypt(keyword=bytearray(self.key.get().upper(),"ascii"),ciphertext=self.cipher)
 		self.outputText = tk.Text(tk.Toplevel())
 		with open("output.txt","r") as out:
@@ -276,4 +285,5 @@ IGNORE_POLY = False
 for i in sys.argv:
 	if i == "--ignore-poly": IGNORE_POLY = True
 start = Start(root)
-root.mainloop()
+mp.Process(target=root.mainloop).start()
+#IPython.embed()

@@ -20,8 +20,12 @@ def decrypt(keyword,ciphertext):
 	solved = ""
 	#print(ciphertext)
 	for i in ciphertext:
+		open("log.txt","a").write(chr(i))
 		#print(chr(i), end = " ")
+		if 97 <= i <= 122:
+			i -= 32
 		if 65 <= i <= 90: 
+			open("log.txt","a").write("yay")
 			solved += chr((i - keyword[index])%26 + 65)
 			index = (index+1)%(len(keyword))
 		else:
