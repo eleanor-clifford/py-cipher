@@ -6,8 +6,12 @@ __debug = False
 from collections import namedtuple , Counter
 import copy, sys
 import numpy as np
-from src import core,file
-from src.TWL06 import twl
+try:
+	from src import core,file
+	from src.TWL06 import twl
+except:
+	import core,file
+	from TWL06 import twl
 def pattern(word,utf8=False):
 	pattern = np.zeros(len(word),dtype="int")
 	index = 0

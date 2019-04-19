@@ -1,5 +1,9 @@
-from src import core, dictionary, substitution as s, hill as h
-from src.TWL06 import twl
+try:
+	from src import file, core, dictionary, substitution as s, hill as h
+	from src.TWL06 import twl
+except:
+	import file, core, dictionary, substitution as s, hill as h
+	from TWL06 import twl
 import tkinter as tk
 import string
 
@@ -80,3 +84,11 @@ def hill(cipher):
 					print(i,file=out)
 					flag = True
 		return flag
+'''
+a = file.openAsAscii("idek.txt")
+a = str(a,"ascii")
+translator = str.maketrans('', '', string.punctuation)
+a = a.translate(translator)
+a = a.replace(" ","").replace("\n","")
+a = bytearray(a,"ascii")
+print(hill(a))'''

@@ -33,8 +33,12 @@ def frequencyAnalysisWithC(N, ciphertext):
 	'''
 	ciphertext = bytearray(str(ciphertext,"utf-8").replace(" ","").replace("\n","").upper(),"ascii")
 	chiSquaredArray = hillcwrapper.frequencyAnalysis(N,ciphertext)
+	print(chiSquaredArray[406])
+	print(sorted(chiSquaredArray)[0])
 	sortedP = [x for _,x in sorted(zip(chiSquaredArray,range(26**N)))]
-	best = [[(p//(26**n))%26 for n in range(N-1,-1,-1)] for p in sortedP[:N]]
+	best = [[(p//(26**n))%26 for n in range(N-1,-1,-1)] for p in sortedP[:N+1]]
 	for p in permutations(best):
+		p = p[:N]
+		#print(p)
 		if np.linalg.det(p) != 0:
 			yield solve(p,N,ciphertext)
