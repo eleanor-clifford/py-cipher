@@ -1,3 +1,9 @@
+
+
+| :exclamation:  | This is a mirror of [https://git.sr.ht/~ecc/py-cipher](https://git.sr.ht/~ecc/py-cipher). Please refrain from using GitHub's issue and PR system.  |
+|----------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------|
+
+
 # py-cipher
 A few common tools for classical cipher cracking, implemented in Python 3 and C. Uses fogleman's TWL06
 
